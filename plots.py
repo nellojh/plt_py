@@ -86,106 +86,142 @@ def plot_line():
     plt.savefig(f'pics/line.png', format='png')  # 建议保存为svg格式,再用inkscape转为矢量图emf后插入word中
     plt.show()
 
+
 def plot_multi_bar():
+    group_labels = ['Model A', 'Model B', 'Model C']
+    bar_labels = ['Baseline', 'Ours']
 
-    model1 = np.array([15])
-    # model2 = np.array([0.0351, 0.0557, 0.0916, 0.1315, 0.1860])
-    # model3 = np.array([0.0586, 0.0865, 0.1046, 0.1476, 0.2160])
+    data = {
+        'Model A': {
+            'Baseline': [7.0],
+            'Ours':     [3.6],
+        },
+        'Model B': {
+            'Baseline': [10.0],
+            'Ours':     [4.0],
+        },
+        'Model C': {
+            'Baseline': [5.5],
+            'Ours':     [2.1],
+        }
+    }
 
-    Ours = np.array([0.5043])
+    colors = ['bisque', 'pink']
+    hatches = ['///', '.']
 
-    # label在图示(legend)中显示。若为数学公式,则最好在字符串前后添加"$"符号
-    # color：b:blue、g:green、r:red、c:cyan、m:magenta、y:yellow、k:black、w:white、、、
-    # 线型：-  --   -.  :    ,
-    # marker：.  ,   o   v    <    *    +    1
-    plt.figure(figsize=(7, 4))
-    # linestyle = "-"
-    x = np.arange(1)
-    # n 为有几个柱子
-    total_width, n = 0.8, 2
-    width = total_width / n
-    x = x - (total_width - width) / n
+    fig, ax = plt.subplots(figsize=(8, 5))
 
+    group_gap = 1.5
+    bar_width = 0.35
+    bar_gap = 0 # 组内间距
 
-    # low = 0.05
-    # up = 0.44
-    low = 1e-2
-    up = 1e3
-    plt.ylim(low, up)
-    # plt.xlabel("Amount of Data", fontsize=15)
-    plt.ylabel(f"Pruning Trigger Rate", fontsize=20)
-    # labels = ['Model1', 'Model2', 'Model3', 'Ours']
-    labels = ['OpenGauss-DiskANN', 'Ours']
+    x_ticks = []
+    x_tick_labels = []
 
-    # 'tomato', 'blue', 'orange', 'green', 'purple', 'deepskyblue'
-    plt.bar(x, model1, width=width, color='blue', edgecolor='w', hatch='///')  # , edgecolor='k',)
-    # plt.bar(x + width, model2, width=width, color='green', edgecolor='w')  # , edgecolor='k',)
-    # plt.bar(x + 2*width, model3, width=width, color='orange', edgecolor='w')  # , edgecolor='k',)
-    plt.bar(x + width, Ours, width=width, color='tomato', edgecolor='w', hatch='.')  # , edgecolor='k',)
+    for i, group in enumerate(group_labels):
+        base_x = i * group_gap
+        x_ticks.append(base_x)
+        x_tick_labels.append(group)
 
-    # plt.xticks(x +1.5*width, labels=['20%', '40%', '60%', '80%', '100%'], fontsize=20)
-    plt.xticks(x +1.5*width, labels=['deep'], fontsize=20)
+        for j, bar in enumerate(bar_labels):
+            x = base_x + (j - 0.5) * (bar_width + bar_gap)
+            height = data[group][bar][0]
+            ax.bar(x, height, width=bar_width,
+                   color=colors[j], hatch=hatches[j], edgecolor='b',
+                   label=bar if i == 0 else None)
 
-    # y_lables = ['0%', '20%', '40%', '60%', '80%', '100%']
-    # y_ticks = [float(i) for i in y_lables]
-    # y_ticks = [0, 0.2, 0.4, 0.6, 0.8, 1]
-    # plt.yscale('linear')
-    y_ticks = [1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3]
-    y_lables = [r'$10^{%d}$' % i for i in range(-2, 4)]
-    plt.yscale('log')
-    # y_ticks = [0.25, 0.30, 0.35, 0.40, 0.45]
-    # y_lables = ['0.25', '0.30', '0.35', '0.40', '0.45']
-    plt.yticks(np.array(y_ticks), y_lables, fontsize=20)#bbox_to_anchor=(0.30, 1)
-    plt.legend(labels=labels, ncol=2,
-               prop={'size': 14})
+    # 设置组标签
+    ax.set_xticks(x_ticks)
+    ax.set_xticklabels(x_tick_labels, fontsize=12)
+
+    # y轴对数刻度
+    ax.set_yscale('log')
+    ax.set_ylim(1e-2, 1e2)
+    y_ticks = [1e-2, 1e-1, 1e0, 1e1, 1e2]
+    y_labels = [r'$10^{%d}$' % i for i in range(-2, 3)]
+    ax.set_yticks(y_ticks)
+    ax.set_yticklabels(y_labels, fontsize=12)
+
+    ax.set_ylabel("Pruning Trigger Rate", fontsize=14)
+
+    # 图例去重
+    handles, labels = ax.get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    ax.legend(by_label.values(), by_label.keys(), ncol=2, fontsize=10, loc='upper right')
+
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
 
     plt.tight_layout()
-    plt.savefig('./pics/multi_bar.png', format='png')
+    plt.savefig('./pics/plot_multi_bar.png', dpi=300)
     plt.show()
-    # 建议保存为svg格式,再用inkscape转为矢量图emf后插入word中
-import matplotlib.pyplot as plt
-import numpy as np
+
+
+
 
 def plot_multi_bar_cut():
-    model1 = np.array([15])
-    ours = np.array([0.5043])
+    group_labels = ['Model A', 'Model B']
+    bar_labels = ['Baseline', 'Ours']
 
-    # 将 model1 分成 3 部分（堆叠显示）
-    parts_model1 = [0.2 * model1[0], 0.5 * model1[0], 0.3 * model1[0]]
-    colors_model1 = ['blue', 'deepskyblue', 'lightblue']
-    labels_model1 = ['Part A', 'Part B', 'Part C']  # 用于 legend 显示
+    data = {
+        'Model A': {
+            'Baseline': [2.5, 3.0, 1.5],
+            'Ours':     [1.2, 1.6, 0.8],
+        },
+        'Model B': {
+            'Baseline': [5.0, 2.5, 2.5],
+            'Ours':     [2.0, 1.0, 1.0],
+        }
+    }
 
-    plt.figure(figsize=(7, 4))
-    x = np.arange(1)
-    total_width, n = 0.8, 2
-    width = total_width / n
-    x = x - (total_width - width) / n
+    colors = ['blue', 'deepskyblue', 'lightblue']
+    part_labels = ['Part A', 'Part B', 'Part C']
 
-    plt.ylim(1e-2, 1e3)
-    plt.yscale('log')
-    plt.ylabel("Pruning Trigger Rate", fontsize=20)
+    fig, ax = plt.subplots(figsize=(8, 5))
 
-    # 画 model1 的堆叠柱子
-    bottom = 0
-    for i in range(3):
-        plt.bar(x, parts_model1[i], bottom=bottom, width=width, color=colors_model1[i], edgecolor='w', label=labels_model1[i])
-        bottom += parts_model1[i]
+    group_gap = 1.5
+    bar_width = 0.35
+    bar_gap = 0.1
 
-    # 画 Ours 普通柱子（不堆叠）
-    plt.bar(x + width, ours, width=width, color='tomato', edgecolor='w', hatch='...', label='Ours')
+    bar_positions = []
+    tick_positions = []
+    tick_labels = []
 
-    # x轴标签
-    plt.xticks(x + 1.5 * width, labels=['deep'], fontsize=20)
+    for i, group in enumerate(group_labels):
+        base_x = i * group_gap
+        tick_positions.append(base_x)
+        tick_labels.append(group)
 
-    # y轴对数标签
-    y_ticks = [1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3]
-    y_labels = [r'$10^{%d}$' % i for i in range(-2, 4)]
-    plt.yticks(y_ticks, y_labels, fontsize=20)
+        for j, bar in enumerate(bar_labels):
+            x = base_x + (j - 0.5) * (bar_width + bar_gap)
+            bar_positions.append((x, bar))
+            bottom = 0
+            for k in range(len(part_labels)):
+                height = data[group][bar][k]
+                ax.bar(x, height, width=bar_width, bottom=bottom, color=colors[k],
+                       edgecolor='white', label=part_labels[k] if i == 0 and j == 0 else "")
+                bottom += height
 
-    # 图例
-    plt.legend(ncol=2, prop={'size': 14})
+    # 设置主组标签
+    ax.set_xticks(tick_positions)
+    ax.set_xticklabels(tick_labels, fontsize=12)
+
+    # 设置每个 bar 上方的标签（如 Baseline/Ours）
+    for x, bar in bar_positions:
+        ax.text(x, -0.5, bar, ha='center', va='top', fontsize=9)
+
+    # 图例去重
+    handles, labels = ax.get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    ax.legend(by_label.values(), by_label.keys(), fontsize=10, loc='upper right')
+
+    ax.set_ylim(0, 9)
+    ax.set_ylabel("Y Value", fontsize=13)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
     plt.tight_layout()
-    plt.savefig('./pics/plot_multi_bar_cut.png', format='png')
+    plt.savefig('./pics/plot_multi_bar_cut.png', dpi=300)
     plt.show()
 
 def plot_bar_and_line():

@@ -59,7 +59,7 @@ plot_multi_bar()
 ```
 plot_multi_bar_cut()
 ```
-![avatar](pics/multi_bar_cut.png)
+![avatar](pics/plot_multi_bar_cut.png)
 
 ### 多柱状图（有重叠）
 
